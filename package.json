@@ -1,0 +1,28 @@
+{
+  "name": "arca-flujo-recursos",
+  "version": "1.0.0",
+  "description": "Flujo de recursos",
+  "main": "middleware.js",
+  "scripts": {
+    "start": "node middleware.js",
+    "static": "http-server -c-1 -p 9004 ./static"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/m3co/arca-flujo-recursos"
+  },
+  "author": "Andres Rios <rianby64@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/m3co/arca-flujo-recursos/issues"
+  },
+  "homepage": "https://github.com/m3co/arca-flujo-recursos#readme",
+  "dependencies": {
+    "d3": "^4.13.0",
+    "express": "^4.16.2",
+    "http-proxy-middleware": "^0.17.4",
+    "http-server": "^0.10.0",
+    "ini": "^1.3.5",
+    "socket.io-client": "^2.0.4"
+  }
+}

@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+  <head>
+    <script src="node_modules/socket.io-client/dist/socket.io.js"></script>
+    <script src="node_modules/d3/build/d3.min.js"></script>
+    <script src="client.js"></script>
+    <style>
+      body {
+        font-family: "sans-serif";
+        font-size: 10px;
+      }
+      div.tooltip {
+        position: absolute;
+        padding: 2px;
+        font: 12px sans-serif;
+        background: lightsteelblue;
+        border: 0px;
+        border-radius: 8px;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="tooltip" style="opacity:0;"></div>
+    Hello world!
+  </body>
+</html>
