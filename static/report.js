@@ -11,10 +11,12 @@
   }
 
   Report.prototype.render = function render(row) {
-    var found;
+    var found, foundAPU;
     var period = {
       start: row.start,
-      end: row.end
+      end: row.end,
+      cost: row.cost,
+      qop: row.qop
     };
     period[DTSym] = `${row.start.toISOString()}-${row.end.toISOString()}`;
     found = periods.find(d => d[DTSym] == period[DTSym]);
@@ -41,7 +43,12 @@
 
     found = supplies.find(d => d.SupplyId == supply.SupplyId);
     if (found) {
-      found.APU.push(APU);
+      var foundAPU = found.APU.find(d => d.APUId == APU.APUId);
+      if (foundAPU) {
+        foundAPU.periods.push(period);
+      } else {
+        found.APU.push(APU);
+      }
     } else {
       supplies.push(supply);
     }
