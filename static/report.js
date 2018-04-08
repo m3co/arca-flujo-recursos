@@ -6,11 +6,19 @@
   window.supplies = supplies;
   window.periods = periods;
 
+  const SUPPLIES_COLUMNS = [
+    "SupplyId",
+    "Supplies_description",
+    "Supplies_unit",
+    "Supplies_type",
+    "Supplies_cost"];
+
   function Report() {
 
   }
 
-  Report.prototype.render = function render(row) {
+  Report.prototype.render = function(row) {
+    if (!row) return;
     var found, foundAPU;
     var period = {
       start: row.start,
@@ -52,6 +60,28 @@
     } else {
       supplies.push(supply);
     }
+
+    render();
+  }
+
+
+  function render() {
+    console.log('render', supplies.length);
+    var thead = d3.select('table thead');
+    var tbody = d3.select('table tbody');
+
+    var trs = tbody.selectAll('tr.supply').data(supplies);
+    var tr = trs.enter().append('tr').attr('class', 'supply');
+
+    tds = tr.selectAll('td.supply').data(d => {
+      return SUPPLIES_COLUMNS.map(k => ({
+        key: k,
+        value: d[k]
+      }));
+    });
+    tds.enter().append('td').attr('class', 'supply')
+      .attr('key', d => d.key)
+      .text(d => d.value ? d.value : '-');
   }
 
   window.report = new Report();
