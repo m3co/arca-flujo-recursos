@@ -1,6 +1,7 @@
 
 (() => {
   var DTSym = Symbol();
+  var TypeSymb = Symbol();
   var supplies = [];
   var periods = [];
   window.supplies = supplies;
@@ -12,6 +13,13 @@
     "Supplies_unit",
     "Supplies_type",
     "Supplies_cost"];
+
+  const APU_COLUMNS = [
+    "APUId",
+    "APU_description",
+    "APU_unit",
+    "APU_type",
+    "APU_cost"];
 
   function Report() {
 
@@ -40,6 +48,7 @@
       Tasks_end:          row.Tasks_end,
       periods: [period]
     };
+    APU[TypeSymb] = 'APU';
     var supply = {
       SupplyId:             row.SupplyId,
       Supplies_cost:        row.Supplies_cost,
@@ -48,6 +57,7 @@
       Supplies_unit:        row.Supplies_unit,
       APU: [APU]
     };
+    supply[TypeSymb] = 'supply';
 
     found = supplies.find(d => d.SupplyId == supply.SupplyId);
     if (found) {
@@ -64,22 +74,27 @@
     render();
   }
 
-
   function render() {
-    console.log('render', supplies.length);
     var thead = d3.select('table thead');
     var tbody = d3.select('table tbody');
 
-    var trs = tbody.selectAll('tr.supply').data(supplies);
-    var tr = trs.enter().append('tr').attr('class', 'supply');
+    var trs = tbody.selectAll('tr').data(supplies.reduce((acc, d) => {
+      acc.push(d);
+      acc.push(...d.APU);
+      return acc;
+    }, []));
+    var tr = trs.enter().append('tr').attr('class', d => d[TypeSymb]);
 
-    tds = tr.selectAll('td.supply').data(d => {
-      return SUPPLIES_COLUMNS.map(k => ({
+    tds = tr.selectAll('td').data(d =>
+      d[TypeSymb] == 'supply' ? SUPPLIES_COLUMNS.map(k => ({
         key: k,
         value: d[k]
-      }));
-    });
-    tds.enter().append('td').attr('class', 'supply')
+      })) : APU_COLUMNS.map(k => ({
+        key: k,
+        value: d[k]
+      }))
+    );
+    tds.enter().append('td')
       .attr('key', d => d.key)
       .text(d => d.value ? d.value : '-');
   }
