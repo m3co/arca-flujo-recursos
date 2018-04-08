@@ -1,13 +1,11 @@
 
 (() => {
   var DTSym = Symbol();
-  var TypeSymb = Symbol();
+  var TypeSym = Symbol();
   var supplies = [];
   var periods = [];
-  var operiods = {};
   window.supplies = supplies;
   window.periods = periods;
-  window.operiods = operiods;
 
   const SUPPLIES_COLUMNS = [
     "SupplyId",
@@ -40,10 +38,11 @@
     found = periods.find(d => d[DTSym] == period[DTSym]);
     if (!found) {
       periods.push(period);
-      periods.reduce((acc, d) => {
-        acc[d[DTSym]] = d;
-        return acc;
-      }, operiods);
+      periods.sort((a, b) => {
+        if (a.start.valueOf() > b.start.valueOf()) return 1;
+        if (a.start.valueOf() < b.start.valueOf()) return -1;
+        return 0;
+      });
     }
     var APU = {
       APUId:              row.APUId,
@@ -54,7 +53,7 @@
       Tasks_end:          row.Tasks_end,
       periods: [period]
     };
-    APU[TypeSymb] = 'APU';
+    APU[TypeSym] = 'APU';
     var supply = {
       SupplyId:             row.SupplyId,
       Supplies_cost:        row.Supplies_cost,
@@ -63,7 +62,7 @@
       Supplies_unit:        row.Supplies_unit,
       APU: [APU]
     };
-    supply[TypeSymb] = 'supply';
+    supply[TypeSym] = 'supply';
 
     found = supplies.find(d => d.SupplyId == supply.SupplyId);
     if (found) {
@@ -84,32 +83,41 @@
     var thead = d3.select('table thead tr');
     var tbody = d3.select('table tbody');
 
-    thead.selectAll('th.periods').data(periods).enter()
-      .append('th').text(d => d.start.toLocaleDateString());
+    thead.selectAll('th.periods').data(periods).enter().append('th')
+      .attr('class', 'periods')
+      .text(d => d.start.toLocaleDateString());
     var trs = tbody.selectAll('tr').data(supplies.reduce((acc, d) => {
       acc.push(d);
       acc.push(...d.APU);
       return acc;
     }, []));
-    var tr = trs.enter().append('tr').attr('class', d => d[TypeSymb]);
+    var tr = trs.enter().append('tr').attr('class', d => d[TypeSym]);
 
     tds = tr.selectAll('td').data(d =>
-      d[TypeSymb] == 'supply' ? SUPPLIES_COLUMNS.map(k => ({
+      d[TypeSym] == 'supply' ? SUPPLIES_COLUMNS.map(k => ({
         key: k,
+        row: d,
+        type: 'supply',
         value: d[k]
       })) : APU_COLUMNS.map(k => ({
         key: k,
+        row: d,
+        type: 'APU',
         value: d[k]
       })).concat(periods.map((p, i) => ({
         key: `period${i}`,
-        value: JSON.stringify(
-          d.periods.find(b => b.start.valueOf() == p.start.valueOf())
-        )
+        type: 'period',
+        value: d.periods.find(b => b.start.valueOf() == p.start.valueOf())
       })))
     );
     tds.enter().append('td')
       .attr('key', d => d.key)
-      .text(d => d.value ? d.value : '-');
+      .text(d => {
+        if (d.type == 'period') {
+          return d.value ? d.value.cost : '-';
+        }
+        return d.value ? d.value : '-'
+      });
   }
 
   window.report = new Report();
