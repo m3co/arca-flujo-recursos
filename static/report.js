@@ -4,8 +4,10 @@
   var TypeSymb = Symbol();
   var supplies = [];
   var periods = [];
+  var operiods = {};
   window.supplies = supplies;
   window.periods = periods;
+  window.operiods = operiods;
 
   const SUPPLIES_COLUMNS = [
     "SupplyId",
@@ -38,6 +40,10 @@
     found = periods.find(d => d[DTSym] == period[DTSym]);
     if (!found) {
       periods.push(period);
+      periods.reduce((acc, d) => {
+        acc[d[DTSym]] = d;
+        return acc;
+      }, operiods);
     }
     var APU = {
       APUId:              row.APUId,
@@ -75,9 +81,11 @@
   }
 
   function render() {
-    var thead = d3.select('table thead');
+    var thead = d3.select('table thead tr');
     var tbody = d3.select('table tbody');
 
+    thead.selectAll('th.periods').data(periods).enter()
+      .append('th').text(d => d.start.toLocaleDateString());
     var trs = tbody.selectAll('tr').data(supplies.reduce((acc, d) => {
       acc.push(d);
       acc.push(...d.APU);
@@ -92,7 +100,12 @@
       })) : APU_COLUMNS.map(k => ({
         key: k,
         value: d[k]
-      }))
+      })).concat(periods.map((p, i) => ({
+        key: `period${i}`,
+        value: JSON.stringify(
+          d.periods.find(b => b.start.valueOf() == p.start.valueOf())
+        )
+      })))
     );
     tds.enter().append('td')
       .attr('key', d => d.key)
