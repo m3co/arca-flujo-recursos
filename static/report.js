@@ -2,23 +2,24 @@
 (() => {
   var DTSym = Symbol();
   var TypeSym = Symbol();
+  var APUIdSym = Symbol();
   var supplies = [];
   var periods = [];
+  window.supplies = supplies;
+  window.periods = periods;
   var lastSTO = null;
 
   const SUPPLIES_COLUMNS = [
     "SupplyId",
     "Supplies_description",
     "Supplies_unit",
-    "Supplies_type",
-    "Supplies_cost"];
+    "Supplies_type"];
 
   const APU_COLUMNS = [
     "APUId",
     "APU_description",
     "APU_unit",
-    "APU_type",
-    "APU_cost"];
+    "APU_type"];
 
   function Report() {
 
@@ -53,6 +54,14 @@
       periods: [period]
     };
     APU[TypeSym] = 'APU';
+    APU[APUIdSym] = APU.APUId.split('.')
+      .reduce((acc, d, i, array) => {
+        acc.push(`${'0'.repeat(5 - d.length)}${d}`);
+        if (i + 1 == array.length) {
+          acc.push(...(new Array(8 - array.length)).fill('00000'));
+        }
+        return acc;
+      }, []).join('');
     var supply = {
       SupplyId:             row.SupplyId,
       Supplies_cost:        row.Supplies_cost,
@@ -76,9 +85,19 @@
         }
       } else {
         found.APU.push(APU);
+        found.APU.sort((a, b) => {
+          if (a[APUIdSym] > b[APUIdSym]) return 1;
+          if (a[APUIdSym] < b[APUIdSym]) return -1;
+          return 0;
+        });
       }
     } else {
       supplies.push(supply);
+      supplies.sort((a, b) => {
+        if (a.SupplyId > b.SupplyId) return -1;
+        if (a.SupplyId < b.SupplyId) return 1;
+        return 0;
+      });
     }
 
     // <crutches and more crutches!>
