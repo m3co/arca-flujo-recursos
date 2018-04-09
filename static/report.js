@@ -137,12 +137,18 @@
   }
 
   function render() {
-    var thead = d3.select('table thead tr');
     var tbody = d3.select('table tbody');
 
-    thead.selectAll('th.periods').data(periods).enter().append('th')
+    d3.select('table thead tr.periods').selectAll('th.periods')
+      .data(periods).enter().append('th')
       .attr('class', 'periods')
       .text(d => d.start.toLocaleDateString());
+
+    d3.select('table thead tr').selectAll('th.periods')
+      .data(periods).enter().append('th')
+      .attr('class', 'periods')
+      .text((d, i) => i + 1);
+
     var trs = tbody.selectAll('tr').data(supplies.reduce((acc, d) => {
       acc.push(d);
       acc.push(...d.APU);
