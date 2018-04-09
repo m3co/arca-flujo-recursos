@@ -4,8 +4,7 @@
   var TypeSym = Symbol();
   var supplies = [];
   var periods = [];
-  window.supplies = supplies;
-  window.periods = periods;
+  var lastSTO = null;
 
   const SUPPLIES_COLUMNS = [
     "SupplyId",
@@ -68,7 +67,13 @@
     if (found) {
       var foundAPU = found.APU.find(d => d.APUId == APU.APUId);
       if (foundAPU) {
-        foundAPU.periods.push(period);
+        var foundPeriod = foundAPU.periods
+          .find(d => d.start.valueOf() == period.start.valueOf());
+        if (foundPeriod) {
+          foundPeriod.cost += period.cost;
+        } else {
+          foundAPU.periods.push(period);
+        }
       } else {
         found.APU.push(APU);
       }
@@ -76,7 +81,15 @@
       supplies.push(supply);
     }
 
-    render();
+    // <crutches and more crutches!>
+    if (lastSTO) {
+      clearTimeout(lastSTO);
+    }
+    lastSTO = setTimeout(() => {
+      if (lastSTO < 100) return;
+      render();
+    }, 200);
+    // </crutches and more crutches!>
   }
 
   function render() {
@@ -91,7 +104,13 @@
       acc.push(...d.APU);
       return acc;
     }, []));
-    var tr = trs.enter().append('tr').attr('class', d => d[TypeSym]);
+    var tr = trs.enter().append('tr').attr('class', d => d[TypeSym])
+      .style('background-color', (d, i) => {
+        return i % 2 ? 'white' : '#f0f0f0';
+      })
+      .style('color', (d, i) => {
+        return d[TypeSym] == 'supply' ? 'red' : '';
+      });
 
     tds = tr.selectAll('td').data(d =>
       d[TypeSym] == 'supply' ? SUPPLIES_COLUMNS.map(k => ({
@@ -114,7 +133,10 @@
       .attr('key', d => d.key)
       .text(d => {
         if (d.type == 'period') {
-          return d.value ? d.value.cost : '-';
+          return d.value ? `$${Math.floor(Number(d.value.cost)).toLocaleString()}` : '';
+        }
+        if (d.type == 'supply') {
+          return d.value ? d.value : 'Estimado'
         }
         return d.value ? d.value : '-'
       });
