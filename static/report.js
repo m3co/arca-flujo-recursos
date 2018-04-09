@@ -107,19 +107,29 @@
     lastSTO = setTimeout(() => {
       if (lastSTO < 100) return;
       supplies.forEach(d => {
+        d.periods = [];
         d.periods = (d.APU.reduce((acc, d) => {
-          d.periods.reduce((acc, d) => {
-            var found = acc.find(b => b[DTSym] == d[DTSym]);
-            if (found) {
-              found.cost += d.cost;
-              found.qop += d.qop;
-            } else {
-              acc.push(d);
+          acc.push(...d.periods.map(d => {
+            var b = {
+              start: d.start,
+              end: d.end,
+              cost: d.cost,
+              qop: d.qop
             }
-            return acc;
-          }, acc);
+            b[DTSym] = `${b.start.toISOString()}-${b.end.toISOString()}`;
+            return b;
+          }));
           return acc;
-        }, []));
+        }, [])).reduce((acc, d) => {
+          var found = acc.find(b => b[DTSym] == d[DTSym]);
+          if (found) {
+            found.cost += d.cost;
+            found.qop += d.qop;
+          } else {
+            acc.push(d);
+          }
+          return acc;
+        }, []);
       });
       render();
     }, 200);
