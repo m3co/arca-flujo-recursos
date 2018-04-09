@@ -106,6 +106,21 @@
     }
     lastSTO = setTimeout(() => {
       if (lastSTO < 100) return;
+      supplies.forEach(d => {
+        d.periods = (d.APU.reduce((acc, d) => {
+          d.periods.reduce((acc, d) => {
+            var found = acc.find(b => b[DTSym] == d[DTSym]);
+            if (found) {
+              found.cost += d.cost;
+              found.qop += d.qop;
+            } else {
+              acc.push(d);
+            }
+            return acc;
+          }, acc);
+          return acc;
+        }, []));
+      });
       render();
     }, 200);
     // </crutches and more crutches!>
@@ -137,7 +152,11 @@
         row: d,
         type: 'supply',
         value: d[k]
-      })) : APU_COLUMNS.map(k => ({
+      })).concat(periods.map((p, i) => ({
+        key: `period${i}`,
+        type: 'period',
+        value: d.periods.find(b => b.start.valueOf() == p.start.valueOf())
+      }))) : APU_COLUMNS.map(k => ({
         key: k,
         row: d,
         type: 'APU',
