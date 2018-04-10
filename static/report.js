@@ -3,7 +3,7 @@
   var DTSym = Symbol();
   var TypeSym = Symbol();
   var APUIdSym = Symbol();
-  var NoKey = Symbol();
+  var NoKey = 'NOKEY';
   var supplies = [];
   var periods = [];
   window.supplies = supplies;
