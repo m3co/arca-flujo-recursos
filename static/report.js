@@ -19,7 +19,9 @@
     "APUId",
     "APU_description",
     "APU_unit",
-    "APU_type"];
+    "APU_type",
+    "Tasks_start",
+    "Tasks_end"];
 
   function Report() {
 
@@ -82,6 +84,10 @@
           foundPeriod.cost += period.cost;
         } else {
           foundAPU.periods.push(period);
+          if (foundAPU.Tasks_start > APU.Tasks_start)
+            foundAPU.Tasks_start = APU.Tasks_start;
+          if (foundAPU.Tasks_end < APU.Tasks_end)
+            foundAPU.Tasks_end = APU.Tasks_end;
         }
       } else {
         found.APU.push(APU);
@@ -192,7 +198,9 @@
         if (d.type == 'supply') {
           return d.value ? d.value : 'Estimado'
         }
-        return d.value ? d.value : '-'
+        return d.value ? (
+          (d.key == 'Tasks_start' || d.key == 'Tasks_end') ?
+            d.value.toLocaleDateString() : d.value) : '-'
       });
   }
 
