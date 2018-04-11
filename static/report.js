@@ -6,8 +6,10 @@
   var NoKey = 'NOKEY';
   var supplies = [];
   var periods = [];
+  var allperiods = [];
   window.supplies = supplies;
   window.periods = periods;
+  window.allperiods = allperiods;
   var lastSTO = null;
 
   const SUPPLIES_COLUMNS = [
@@ -38,18 +40,21 @@
       cost: row.cost,
       qop: row.qop
     };
+    allperiods.push({
+      start: row.start,
+      end: row.end,
+      cost: row.cost,
+      qop: row.qop
+    });
     period[DTSym] = `${row.start.toISOString()}-${row.end.toISOString()}`;
     found = periods.find(d => d[DTSym] == period[DTSym]);
     if (!found) {
-      period.periods = [JSON.parse(JSON.stringify(period))];
       periods.push(period);
       periods.sort((a, b) => {
         if (a.start.valueOf() > b.start.valueOf()) return 1;
         if (a.start.valueOf() < b.start.valueOf()) return -1;
         return 0;
       });
-    } else {
-      //found.periods.push(period);
     }
     var APU = {
       APUId:              row.APUId,
@@ -153,10 +158,14 @@
     d3.select('table thead tr.totals').selectAll('th.totals')
       .data(periods).enter().append('th')
       .attr('class', 'totals')
-      .text(d => Number(d.periods.reduce((acc, d) => {
-        acc += d.cost;
-        return acc;
-      }, 0).toFixed(0)).toLocaleString());
+      .text(d => {
+        return Number(allperiods
+          .filter(b => b.start.valueOf() == d.start.valueOf())
+          .reduce((acc, d) => {
+            acc += d.cost;
+            return acc;
+          }, 0).toFixed(0)).toLocaleString();
+      });
 
     d3.select('table thead tr.periods').selectAll('th.periods')
       .data(periods).enter().append('th')
