@@ -18,11 +18,21 @@
         border-radius: 8px;
         pointer-events: none;
       }
+      table[show="cost"] span.qop {
+        display: none;
+      }
+      table[show="qop"] span.cost {
+        display: none;
+      }
     </style>
   </head>
   <body>
     <div class="tooltip" style="opacity:0;"></div>
-    <table>
+    <select>
+      <option value="cost">Por costos</option>
+      <option value="qop">Por cantidades</option>
+    </select>
+    <table show="cost">
       <thead>
         <tr>
           <th name="SupplyId">Código</th>

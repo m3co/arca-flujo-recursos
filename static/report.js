@@ -1,5 +1,9 @@
 
 (() => {
+  document.querySelector('select').addEventListener('change', e => {
+    document.querySelector('table').setAttribute('show', e.target.value);
+  });
+
   var DTSym = Symbol();
   var TypeSym = Symbol();
   var APUIdSym = Symbol();
@@ -155,16 +159,26 @@
   function render() {
     var tbody = d3.select('table tbody');
 
-    d3.select('table thead tr.totals').selectAll('th.totals')
+    var totals = d3.select('table thead tr.totals').selectAll('th.totals')
       .data(periods).enter().append('th')
-      .attr('class', 'totals')
-      .text(d => {
-        return Number(allperiods
+      .attr('class', 'totals');
+
+    totals.append('span').classed('cost', true).text(d => {
+        return `$${Number(allperiods
           .filter(b => b.start.valueOf() == d.start.valueOf())
           .reduce((acc, d) => {
             acc += d.cost;
             return acc;
-          }, 0).toFixed(0)).toLocaleString();
+          }, 0).toFixed(0)).toLocaleString()}`;
+      });
+
+    totals.append('span').classed('qop', true).text(d => {
+        return Number(allperiods
+          .filter(b => b.start.valueOf() == d.start.valueOf())
+          .reduce((acc, d) => {
+            acc += d.qop;
+            return acc;
+          }, 0).toFixed(2)).toLocaleString();
       });
 
     d3.select('table thead tr.periods').selectAll('th.periods')
@@ -215,7 +229,7 @@
       .attr('key', d => d.key)
       .text(d => {
         if (d.type == 'period') {
-          return d.value ? `$${Math.floor(Number(d.value.cost)).toLocaleString()}` : '';
+          return '';
         }
         if (d.type == 'supply') {
           return d.value ? d.value : (d.key == NoKey ? '' : 'Estimado');
@@ -223,6 +237,24 @@
         return d.value ? (
           (d.key == 'Tasks_start' || d.key == 'Tasks_end') ?
             d.value.toLocaleDateString() : d.value) : '-';
+      })
+      .each(function(d, i, m) {
+        if (d.type == 'period') {
+          d3.select(this)
+            .append('span')
+            .classed('cost', true)
+            .text(d.value
+              ? `$${Math.floor(Number(d.value.cost)).toLocaleString()}`
+              : ''
+            );
+          d3.select(this)
+            .append('span')
+            .classed('qop', true)
+            .text(d.value
+              ? `${Math.floor(Number(d.value.qop)).toLocaleString()}`
+              : ''
+            );
+        }
       });
   }
 
