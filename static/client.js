@@ -6,7 +6,7 @@
 
     client.emit('data', {
       query: 'select',
-      module: 'viewAPUSuppliesCosts1MonthFlow',
+      module: 'viewAAUSuppliesCosts1MonthFlow',
       project: '2'
     });
 

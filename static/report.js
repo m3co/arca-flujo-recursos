@@ -6,7 +6,7 @@
 
   var DTSym = Symbol();
   var TypeSym = Symbol();
-  var APUIdSym = Symbol();
+  var AAUIdSym = Symbol();
   var NoKey = 'NOKEY';
   var supplies = [];
   var periods = [];
@@ -23,11 +23,11 @@
     "Supplies_type",
     NoKey, NoKey];
 
-  const APU_COLUMNS = [
-    "APUId",
-    "APU_description",
-    "APU_unit",
-    "APU_type",
+  const AAU_COLUMNS = [
+    "AAUId",
+    "AAU_description",
+    "AAU_unit",
+    "AAU_type",
     "Tasks_start",
     "Tasks_end"];
 
@@ -37,7 +37,7 @@
 
   Report.prototype.render = function(row) {
     if (!row) return;
-    var found, foundAPU;
+    var found, foundAAU;
     var period = {
       start: row.start,
       end: row.end,
@@ -60,17 +60,17 @@
         return 0;
       });
     }
-    var APU = {
-      APUId:              row.APUId,
-      APU_description:    row.APU_description,
-      APU_is_estimated:   row.APU_is_estimated,
-      APU_unit:           row.APU_unit,
+    var AAU = {
+      AAUId:              row.AAUId,
+      AAU_description:    row.AAU_description,
+      AAU_is_estimated:   row.AAU_is_estimated,
+      AAU_unit:           row.AAU_unit,
       Tasks_start:        row.Tasks_start,
       Tasks_end:          row.Tasks_end,
       periods: [period]
     };
-    APU[TypeSym] = 'APU';
-    APU[APUIdSym] = APU.APUId.split('.')
+    AAU[TypeSym] = 'AAU';
+    AAU[AAUIdSym] = AAU.AAUId.split('.')
       .reduce((acc, d, i, array) => {
         acc.push(`${'0'.repeat(5 - d.length)}${d}`);
         if (i + 1 == array.length) {
@@ -84,30 +84,30 @@
       Supplies_description: row.Supplies_description,
       Supplies_type:        row.Supplies_type,
       Supplies_unit:        row.Supplies_unit,
-      APU: [APU]
+      AAU: [AAU]
     };
     supply[TypeSym] = 'supply';
 
     found = supplies.find(d => d.SupplyId == supply.SupplyId);
     if (found) {
-      var foundAPU = found.APU.find(d => d.APUId == APU.APUId);
-      if (foundAPU) {
-        var foundPeriod = foundAPU.periods
+      var foundAAU = found.AAU.find(d => d.AAUId == AAU.AAUId);
+      if (foundAAU) {
+        var foundPeriod = foundAAU.periods
           .find(d => d.start.valueOf() == period.start.valueOf());
         if (foundPeriod) {
           foundPeriod.cost += period.cost;
         } else {
-          foundAPU.periods.push(period);
-          if (foundAPU.Tasks_start > APU.Tasks_start)
-            foundAPU.Tasks_start = APU.Tasks_start;
-          if (foundAPU.Tasks_end < APU.Tasks_end)
-            foundAPU.Tasks_end = APU.Tasks_end;
+          foundAAU.periods.push(period);
+          if (foundAAU.Tasks_start > AAU.Tasks_start)
+            foundAAU.Tasks_start = AAU.Tasks_start;
+          if (foundAAU.Tasks_end < AAU.Tasks_end)
+            foundAAU.Tasks_end = AAU.Tasks_end;
         }
       } else {
-        found.APU.push(APU);
-        found.APU.sort((a, b) => {
-          if (a[APUIdSym] > b[APUIdSym]) return 1;
-          if (a[APUIdSym] < b[APUIdSym]) return -1;
+        found.AAU.push(AAU);
+        found.AAU.sort((a, b) => {
+          if (a[AAUIdSym] > b[AAUIdSym]) return 1;
+          if (a[AAUIdSym] < b[AAUIdSym]) return -1;
           return 0;
         });
       }
@@ -128,7 +128,7 @@
       if (lastSTO < 100) return;
       supplies.forEach(d => {
         d.periods = [];
-        d.periods = (d.APU.reduce((acc, d) => {
+        d.periods = (d.AAU.reduce((acc, d) => {
           acc.push(...d.periods.map(d => {
             var b = {
               start: d.start,
@@ -193,7 +193,7 @@
 
     var trs = tbody.selectAll('tr').data(supplies.reduce((acc, d) => {
       acc.push(d);
-      acc.push(...d.APU);
+      acc.push(...d.AAU);
       return acc;
     }, []));
     var tr = trs.enter().append('tr').attr('class', d => d[TypeSym])
@@ -214,10 +214,10 @@
         key: `period${i}`,
         type: 'period',
         value: d.periods.find(b => b.start.valueOf() == p.start.valueOf())
-      }))) : APU_COLUMNS.map(k => ({
+      }))) : AAU_COLUMNS.map(k => ({
         key: k,
         row: d,
-        type: 'APU',
+        type: 'AAU',
         value: d[k]
       })).concat(periods.map((p, i) => ({
         key: `period${i}`,
