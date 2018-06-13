@@ -61,6 +61,7 @@
       });
     }
     var AAU = {
+      APU_defined:              row.APU_defined,
       AAUId:              row.AAUId,
       AAU_description:    row.AAU_description,
       AAU_is_estimated:   row.AAU_is_estimated,
@@ -201,7 +202,8 @@
         return i % 2 ? 'white' : '#f0f0f0';
       })
       .style('color', (d, i) => {
-        return d[TypeSym] == 'supply' ? 'red' : '';
+        console.log(d);
+        return d[TypeSym] == 'supply' ? 'red' : (d.APU_defined ? 'yellow' : '');
       });
 
     tds = tr.selectAll('td').data(d =>
