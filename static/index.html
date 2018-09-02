@@ -3,6 +3,8 @@
   <head>
     <script src="node_modules/socket.io-client/dist/socket.io.js"></script>
     <script src="node_modules/d3/build/d3.min.js"></script>
+    <script src="https://rawgit.com/m3co/arca-utiles/master/combobox-bike.js"></script>
+    <script src="https://rawgit.com/m3co/arca-utiles/master/selector-projects.js"></script>
     <script src="client.js"></script>
     <style>
       body {
@@ -27,6 +29,14 @@
     </style>
   </head>
   <body>
+
+    <selector-projects></selector-projects>
+    <script>
+      'use strict';
+      window.projects = {
+        doselect: document.querySelector('selector-projects').doselect
+      };
+    </script>
     <div class="tooltip" style="opacity:0;"></div>
     <select hidden>
       <option value="cost">Por costos</option>
