@@ -4,7 +4,6 @@
   var params = new URLSearchParams(location.search);
   var ProjectId = params.get('ProjectId');
   var bytype = params.get('bytype');
-  console.log(ProjectId, bytype);
   client.on('connect', () => {
     const req = {
       query: 'select',
@@ -19,7 +18,9 @@
       req.bytype = bytype;
     }
 
-    client.emit('data', req);
+    if (doreq) {
+      client.emit('data', req);
+    }
     client.emit('data', {
       query: 'select',
       module: 'Projects'

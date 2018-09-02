@@ -1,7 +1,12 @@
 
 (() => {
+  var urlparams = new URLSearchParams(window.location.search);
+  var bytype = urlparams.get('bytype');
+  document.querySelector('select#show-supply-type').value = bytype ? bytype : '';
   document.querySelector('select#show-supply-type').addEventListener('change', e => {
-    document.querySelector('table').setAttribute('show', e.target.value);
+    var urlparams = new URLSearchParams(window.location.search);
+    urlparams.set('bytype', e.target.value);
+    window.location.search = urlparams.toString();
   });
 
   var DTSym = Symbol();
