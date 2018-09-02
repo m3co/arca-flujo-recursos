@@ -1,17 +1,25 @@
 'use strict';
 ((io) => {
   var client = io();
-  var ProjectId = location.search.match(/\d+$/);
+  var params = new URLSearchParams(location.search);
+  var ProjectId = params.get('ProjectId');
+  var bytype = params.get('bytype');
+  console.log(ProjectId, bytype);
   client.on('connect', () => {
-    console.log('connection');
+    const req = {
+      query: 'select',
+      module: 'viewAAUSuppliesCosts1MonthFlow',
+    };
+    let doreq = false;
     if (ProjectId) {
-      client.emit('data', {
-        query: 'select',
-        module: 'viewAAUSuppliesCosts1MonthFlow',
-        project: ProjectId
-      });
+      req.project = ProjectId;
+      doreq = true;
+    }
+    if (bytype) {
+      req.bytype = bytype;
     }
 
+    client.emit('data', req);
     client.emit('data', {
       query: 'select',
       module: 'Projects'
