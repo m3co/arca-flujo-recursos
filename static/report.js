@@ -26,7 +26,7 @@
     "Supplies_description",
     "Supplies_unit",
     "Supplies_type",
-    NoKey, NoKey];
+    NoKey, NoKey, "total"];
 
   const AAU_COLUMNS = [
     "AAUId",
@@ -34,7 +34,7 @@
     "AAU_unit",
     "AAU_type",
     "Tasks_start",
-    "Tasks_end"];
+    "Tasks_end", "total"];
 
   function Report() {
 
@@ -133,7 +133,6 @@
     lastSTO = setTimeout(() => {
       if (lastSTO < 100) return;
       supplies.forEach(d => {
-        d.periods = [];
         d.periods = (d.AAU.reduce((acc, d) => {
           acc.push(...d.periods.map(d => {
             var b = {
@@ -156,6 +155,16 @@
           }
           return acc;
         }, []);
+        d.total = {
+          qop: d.periods.reduce((acc, d) => {
+            acc += d.qop;
+            return acc;
+          }, 0),
+          cost: d.periods.reduce((acc, d) => {
+            acc += d.cost;
+            return acc;
+          }, 0)
+        };
       });
       render();
     }, 200);
@@ -233,6 +242,9 @@
     tds.enter().append('td')
       .attr('key', d => d.key)
       .text(d => {
+        if (d.key == 'total') {
+          return '';
+        }
         if (d.type == 'period') {
           return '';
         }
@@ -244,6 +256,22 @@
             d.value.toLocaleDateString() : d.value) : '-';
       })
       .each(function(d, i, m) {
+        if (d.key == 'total') {
+          d3.select(this)
+            .append('div')
+            .classed('cost', true)
+            .text(d.value
+              ? `$${Math.floor(Number(d.value.cost)).toLocaleString()}`
+              : ''
+            );
+          d3.select(this)
+            .append('div')
+            .classed('qop', true)
+            .text(d.value
+              ? `${Number(d.value.qop).toFixed(2).toLocaleString()}`
+              : ''
+            );
+        }
         if (d.type == 'period') {
           d3.select(this)
             .append('div')
@@ -256,7 +284,7 @@
             .append('div')
             .classed('qop', true)
             .text(d.value
-              ? `${Math.floor(Number(d.value.qop)).toLocaleString()}`
+              ? `${Number(d.value.qop).toFixed(2).toLocaleString()}`
               : ''
             );
         }
