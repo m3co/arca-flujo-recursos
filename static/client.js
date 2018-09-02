@@ -8,7 +8,7 @@
       client.emit('data', {
         query: 'select',
         module: 'viewAAUSuppliesCosts1MonthFlow',
-        project: '8'
+        project: ProjectId
       });
     }
 

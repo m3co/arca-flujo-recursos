@@ -1,6 +1,6 @@
 
 (() => {
-  document.querySelector('select').addEventListener('change', e => {
+  document.querySelector('select#show-supply-type').addEventListener('change', e => {
     document.querySelector('table').setAttribute('show', e.target.value);
   });
 
@@ -61,7 +61,7 @@
       });
     }
     var AAU = {
-      APU_defined:              row.APU_defined,
+      APU_defined:        row.APU_defined,
       AAUId:              row.AAUId,
       AAU_description:    row.AAU_description,
       AAU_is_estimated:   row.AAU_is_estimated,
@@ -201,10 +201,8 @@
       .style('background-color', (d, i) => {
         return i % 2 ? 'white' : '#f0f0f0';
       })
-      .style('color', (d, i) => {
-        console.log(d);
-        return d[TypeSym] == 'supply' ? 'red' : (d.APU_defined ? 'yellow' : '');
-      });
+      .style('color', (d, i) =>
+        d[TypeSym] == 'supply' ? 'red' : (d.APU_defined ? 'yellow' : ''));
 
     tds = tr.selectAll('td').data(d =>
       d[TypeSym] == 'supply' ? SUPPLIES_COLUMNS.map(k => ({
@@ -243,14 +241,14 @@
       .each(function(d, i, m) {
         if (d.type == 'period') {
           d3.select(this)
-            .append('span')
+            .append('div')
             .classed('cost', true)
             .text(d.value
               ? `$${Math.floor(Number(d.value.cost)).toLocaleString()}`
               : ''
             );
           d3.select(this)
-            .append('span')
+            .append('div')
             .classed('qop', true)
             .text(d.value
               ? `${Math.floor(Number(d.value.qop)).toLocaleString()}`

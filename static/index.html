@@ -23,9 +23,6 @@
       table[show="cost"] span.qop {
         display: none;
       }
-      table[show="qop"] span.cost {
-        display: none;
-      }
     </style>
   </head>
   <body>
@@ -38,7 +35,7 @@
       };
     </script>
     <div class="tooltip" style="opacity:0;"></div>
-    <select hidden>
+    <select id="show-supply-type">
       <option value="cost">Por costos</option>
       <option value="qop">Por cantidades</option>
     </select>
